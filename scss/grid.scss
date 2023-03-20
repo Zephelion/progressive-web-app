@@ -4,4 +4,8 @@ main ul{
     grid-auto-rows: 96px;
     gap: 0.1em;
     transition: 0.4s;
+
+    li{
+        list-style: none;
+    }
 }
