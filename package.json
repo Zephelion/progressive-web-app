@@ -9,11 +9,12 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "scss": "sass --watch scss/app.scss public/css/app.css --style compressed",
-    "dev-sass" : "npm run scss & npm run dev"
+    "dev-sass": "npm run scss & npm run dev"
   },
   "author": "Russell Numo",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-handlebars": "^7.0.2",
     "nodemon": "^2.0.21"
