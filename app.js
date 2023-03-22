@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 
 
 const app = express();
-const port = 3000;
+const port = 3003;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 app.engine('.hbs', engine({extname: '.hbs'}));
 app.set('view engine', 'hbs');
 app.set('views', './views');
-app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
 app.use('/', router);
 
