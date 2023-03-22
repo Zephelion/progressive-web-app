@@ -1,9 +1,8 @@
-const index = (req, res) => {
-    // res.render('index');
-    res.json({status: "ok"})
+const initialFetchArt = (req, res) => {
+    res.render('index');
 
 };
 
 export {
-    index
+    initialFetchArt
 }
