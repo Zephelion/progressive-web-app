@@ -1,7 +1,11 @@
 <main>
     <ul>
+        {{#each paintings}}
         <li class="loading">
-            <a href=""></a>
+            <a href="{{objectNumber}}">
+                <img src="{{webImage.url}}" alt="{{title}}">
+            </a>
         </li>
+        {{/each}}
     </ul>
 </main>
