@@ -1,11 +1,11 @@
-<main>
-    <ul>
-        {{#each paintings}}
-        <li class="loading">
-            <a href="{{objectNumber}}">
-                <img src="{{smallImg}}" alt="{{title}}">
-            </a>
-        </li>
-        {{/each}}
-    </ul>
-</main>
+<ul>
+    {{#each paintings}}
+    <li class="loading">
+        <a href="/art/{{objectNumber}}">
+            <img src="{{smallImg}}" alt="{{title}}">
+        </a>
+    </li>
+    {{/each}}
+</ul>
+
+<script src="/js/infiniteScroll.js"></script>
