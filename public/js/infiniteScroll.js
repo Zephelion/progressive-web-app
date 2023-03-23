@@ -1,5 +1,9 @@
+const domain = "https://www.rijksmuseum.nl/api/nl/collection/";
+const apiKey = "9ht5U2BA";
+
 let fired = false;
 var page = 2;
+const limit = 30;
 
 
 const loadMoreArt = async () => {
@@ -7,15 +11,16 @@ const loadMoreArt = async () => {
     loading = true;
   
     if(loading){
-      displayLoading();
+    //   displayLoading();
       const response = await fetch(`${domain}?key=${apiKey}&p=${page}&ps=${limit}`);
       const data = await response.json();
     
       const morePaintings = data.artObjects;
+
+      console.log(morePaintings);
     
-      displayArt(morePaintings, "main ul");
-      hideLoading();
-      loading = false;
+    //   displayArt(morePaintings, "main ul");
+    //   hideLoading();
     }
 }
 
@@ -25,8 +30,8 @@ window.addEventListener("scroll", () => {
     if(endOfPage && !fired) {
       
         console.log("end of page");
-    //   loadMoreArt();
-    //   fired = true;
+        loadMoreArt();
+        fired = true;
     }else if(!endOfPage){
       fired = false;
     }

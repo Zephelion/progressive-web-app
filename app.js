@@ -19,7 +19,9 @@ app.use(express.static('public'));
 app.use('/', router);
 
 
-app.listen(port)
+app.listen(port, () => {
+    console.log(`Listening at http://localhost:${port}`)
+});
 // app.get('/', (req, res) => {
 //     res.render('index');
 // });
