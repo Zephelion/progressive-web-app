@@ -39,9 +39,6 @@ const initialFetchArt = async (req, res) => {
             return newPainting;
         }));
 
-        console.log(paintings);
-
-
         res.render('index', {
             paintings: paintings,
         });
@@ -49,9 +46,29 @@ const initialFetchArt = async (req, res) => {
         console.log(error);
     }
     // res.render('index');
+};
 
+const getArt = async (req, res) => {
+    try{
+        const objectNumber = req.params.id;
+        const response = await fetch(`${domain}${objectNumber}?key=${apiKey}`);
+
+        const data = await response.json();
+        const painting = data.artObject;
+        
+        console.log(painting);
+
+        res.render('details', {
+            painting: painting,
+        })
+    }catch(error){
+        console.log(error);
+    }
+    // const id = req.params.id
+    // console.log(id);
 };
 
 export {
-    initialFetchArt
+    initialFetchArt,
+    getArt
 }
