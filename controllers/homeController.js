@@ -28,16 +28,22 @@ const initialFetchArt = async (req, res) => {
         const response = await fetch(`${domain}?key=${apiKey}&p=${page}&ps=${limit}`);
         const {artObjects: data} = await response.json();
 
-        const items = data.map( async (painting) => {
-            const smallImgs = await getSmallerImg(painting.objectNumber);
+        const paintings = await Promise.all(data.map( async (painting) => {
+            const smallImg = await getSmallerImg(painting.objectNumber);
 
-            return smallImgs;
-        });
+            const newPainting = {
+                ...painting,
+                smallImg,
+            };
 
-        console.log(items);
+            return newPainting;
+        }));
+
+        console.log(paintings);
+
 
         res.render('index', {
-            paintings: data,
+            paintings: paintings,
         });
     }catch(error){
         console.log(error);
