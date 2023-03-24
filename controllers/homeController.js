@@ -45,7 +45,6 @@ const initialFetchArt = async (req, res) => {
     }catch(error){
         console.log(error);
     }
-    // res.render('index');
 };
 
 const getArt = async (req, res) => {
