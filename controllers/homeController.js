@@ -70,10 +70,22 @@ const loadMoreArt = async (req, res) => {
     page++;
 
     const response = await fetch(`${domain}?key=${apiKey}&p=${page}&ps=${limit}`);
-    const data = await response.json();
+    
+    const {artObjects: data} = await response.json();
 
-    const morePaintings = data.artObjects;
-    console.log(morePaintings)
+    const morePaintings = await Promise.all(data.map( async (painting) => {
+        const smallImg = await getSmallerImg(painting.objectNumber);
+
+        const newPainting = {
+            ...painting,
+            smallImg,
+        };
+
+        return newPainting;
+    }));
+
+    console.log(morePaintings);
+    res.send(morePaintings)
 
 
     // res.render('index', {
