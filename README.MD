@@ -171,7 +171,7 @@ const getSmallerImg = async(objectNumber) => {
     }
 };
 ```
-above is the function I am passing the objectnNumber as parameter in order to fetch smaller images. Some paintings have no smaller image so for that I return a placeholder image.
+above is the function I am passing the objectNumber as parameter in order to fetch smaller images. Some paintings have no smaller image so for that I return a placeholder image.
 
 This was kind of a tricky part
 
@@ -188,5 +188,42 @@ const paintings = await Promise.all(data.map( async (painting) => {
 }));
 ```
 
-To quickly go over it I am creatig a new object and using the spread operator to insert the small image in the object
+To quickly go over it I am creatig a new object and using the spread operator to insert the `smallImg` in the object. Then I can loop over the array with objects in my handlebars template.
+
+```html
+<ul>
+    {{#each paintings}}
+    <li class="loading">
+        <a href="/art/{{objectNumber}}">
+            <img src="{{smallImg}}" alt="{{title}}">
+        </a>
+    </li>
+    {{/each}}
+</ul>
+
+```
+
+In my layouts/main.hbs
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/app.css">
+    <title>Rijksmuseum</title>
+</head>
+<body>
+    <main>
+        {{{body}}}
+    </main>
+</body>
+</html>
+```
+and voila I did some more but I thought this was the most relevant pieces of code.
+
+## Week 2
+
 
