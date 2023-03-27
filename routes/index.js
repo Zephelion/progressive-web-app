@@ -1,10 +1,11 @@
 import express from 'express';
 const router = express.Router();
-import { initialFetchArt, getArt } from '../controllers/homeController.js';
+import { initialFetchArt, getArt, loadMoreArt } from '../controllers/homeController.js';
 
 
 router.get('/', initialFetchArt);
 router.get('/art/:id', getArt);
+router.get('/loadmore', loadMoreArt);
 
 
 export default router;

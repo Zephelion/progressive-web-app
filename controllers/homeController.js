@@ -63,11 +63,26 @@ const getArt = async (req, res) => {
     }catch(error){
         console.log(error);
     }
-    // const id = req.params.id
-    // console.log(id);
+};
+
+
+const loadMoreArt = async (req, res) => {
+    page++;
+
+    const response = await fetch(`${domain}?key=${apiKey}&p=${page}&ps=${limit}`);
+    const data = await response.json();
+
+    const morePaintings = data.artObjects;
+    console.log(morePaintings)
+
+
+    // res.render('index', {
+    //     morePaintings: morePaintings,
+    // });
 };
 
 export {
     initialFetchArt,
-    getArt
+    getArt,
+    loadMoreArt
 }
