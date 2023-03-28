@@ -61,7 +61,7 @@ const getArt = async (req, res) => {
             painting: painting,
         })
     }catch(error){
-        console.log(error);
+        res.render('error');
     }
 };
 
@@ -87,14 +87,35 @@ const loadMoreArt = async (req, res) => {
     console.log(morePaintings);
     res.send(morePaintings)
 
+};
 
-    // res.render('index', {
-    //     morePaintings: morePaintings,
-    // });
+const search = async (req, res) => {
+    const searchTerm = req.params.searchTerm;
+    const response = await fetch(`${domain}?key=${apiKey}&q=${searchTerm}&p=${page}&ps=30`);
+    const {artObjects: data} = await response.json();
+
+    const searchResults = await Promise.all(data.map( async (painting) => {
+        const smallImg = await getSmallerImg(painting.objectNumber);
+
+        const newPainting = {
+            ...painting,
+            smallImg,
+        };
+
+        return newPainting;
+    }));
+
+    if(searchResults.length == 0){
+        res.send("no results");
+    }else{
+        res.send(searchResults);
+    }
+
 };
 
 export {
     initialFetchArt,
     getArt,
-    loadMoreArt
+    loadMoreArt,
+    search
 }
