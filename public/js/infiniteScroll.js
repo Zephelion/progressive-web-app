@@ -1,6 +1,28 @@
 const url = `http://localhost:3000/loadmore`;
 let loading = false;
 let fired = false;
+export const container = document.querySelector("main ul");
+
+export const displayArt = async (paintings) => {
+
+
+  paintings.forEach(painting => {
+    var liHtml = `
+    <li class="loading">
+      <a href="/art/${painting.objectNumber}">
+        <img src="${painting.smallImg}" alt="${painting.title}" srcset="">
+      </a>
+    </li>`;
+    container.insertAdjacentHTML("beforeend", liHtml);
+    const lastLi = container.lastElementChild;
+
+    setTimeout(() => {
+      lastLi.classList.remove("loading");
+      }, 400);
+    
+  });
+
+};
 
 const loadMoreArt = async () => {
     loading = true;
@@ -9,7 +31,7 @@ const loadMoreArt = async () => {
       const response = await fetch(url);
       const data = await response.json();
 
-      console.log(data);
+      displayArt(data);
 
       loading = false;
 
@@ -17,7 +39,7 @@ const loadMoreArt = async () => {
 }
 
 window.addEventListener("scroll", () => {
-    const endOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight;
+    const endOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight - 500;
     
     if(endOfPage && !fired) {
       
