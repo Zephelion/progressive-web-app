@@ -1,0 +1,25 @@
+form{
+    position: fixed;
+    width: 90%;
+    left: 50%;
+    bottom: 32px;
+    transform: translateX(-50%);
+
+    input{
+        width: 45px;
+        height: 45px;
+        border: none;
+        border-radius: 30px;
+        padding: 0 16px;
+        font-size: 12px;
+        outline: none;
+        background-color: #454545;
+        color: #d0d0d0;
+        transition: 0.4s;
+
+        &:focus{
+            width: 100%;
+            aspect-ratio: 0;
+        }
+    }
+}

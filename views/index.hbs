@@ -1,11 +1,17 @@
 <ul>
     {{#each paintings}}
-        <li class="loading">
+        <li>
             <a href="/art/{{objectNumber}}">
                 <img src="{{smallImg}}" alt="{{title}}">
             </a>
         </li>
     {{/each}}
 </ul>
+<form action="#">
+    <label for="search"></label>
+    <input type="search" name="" id="search" placeholder="Search artist">
+</form>
 
-<script src="/js/infiniteScroll.js"></script>
+<script type="module" src="/js/infiniteScroll.js"></script>
+<script type="module" src="/js/search.js"></script>
+<script src="/js/script.js"></script>
