@@ -9,6 +9,15 @@ const limit = 30;
 
 
 
+const getRelatedArt = async (maker) => {
+    const response = await fetch(`${domain}?key=${apiKey}&involvedMaker=${maker}&ps=10`);
+    var {artObjects: data} = await response.json();
+
+    data.shift();
+    
+    return data;
+};
+
 const getSmallerImg = async(objectNumber) => {
     try{
         const smallerImg = await fetch(`${domain}${objectNumber}/tiles?key=${apiKey}`);
@@ -40,8 +49,6 @@ const initialFetchArt = async (req, res) => {
             return newPainting;
         }));
 
-        console.log(paintings);
-
         res.render('index', {
             paintings: paintings,
         });
@@ -57,10 +64,15 @@ const getArt = async (req, res) => {
 
         const data = await response.json();
         const painting = data.artObject;
-        
+    
+        const maker = painting.principalMaker;
+        const relatedArts = await getRelatedArt(maker);
+
+        console.log(relatedArts);
 
         res.render('details', {
             painting: painting,
+            relatedArts: relatedArts,
         })
     }catch(error){
         res.render('error');

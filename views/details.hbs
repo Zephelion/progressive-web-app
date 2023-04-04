@@ -12,5 +12,13 @@
 
 <section class="related">
 <h2>Related paintings</h2>
-    <ul></ul>
+    <ul>
+        {{#each relatedArts}}
+            <li class="loading">
+                <a href="/art/{{objectNumber}}">
+                    <img src="{{webImage.url}}" alt="{{title}}">
+                </a>
+            </li>
+        {{/each}}
+    </ul>
 </section>
