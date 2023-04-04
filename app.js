@@ -20,7 +20,7 @@ app.use('/', router);
 
 
 app.listen(port, () => {
-    console.log(`Listening at https://localhost:${port}`)
+    console.log(`Listening at http://localhost:${port}`)
 });
 // app.get('/', (req, res) => {
 //     res.render('index');

@@ -29,6 +29,7 @@
     "background_color": "#000000",
     "theme_color": "#454545",
     "short_name": "Rijksmusuem Gallery",
+    "orientation": "portrait",
     "scope": "/"
 
 }
