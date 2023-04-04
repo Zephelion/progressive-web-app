@@ -1,4 +1,4 @@
-const url = `http://localhost:3000/loadmore`;
+const url = `/loadmore`;
 let loading = false;
 let fired = false;
 export const container = document.querySelector("main ul");
