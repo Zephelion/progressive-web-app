@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import fetch from 'node-fetch';
 dotenv.config();
 
 const domain = 'https://www.rijksmuseum.nl/api/nl/collection/';
@@ -39,6 +40,8 @@ const initialFetchArt = async (req, res) => {
             return newPainting;
         }));
 
+        console.log(paintings);
+
         res.render('index', {
             paintings: paintings,
         });
@@ -55,7 +58,6 @@ const getArt = async (req, res) => {
         const data = await response.json();
         const painting = data.artObject;
         
-        console.log(painting);
 
         res.render('details', {
             painting: painting,
@@ -84,7 +86,6 @@ const loadMoreArt = async (req, res) => {
         return newPainting;
     }));
 
-    console.log(morePaintings);
     res.send(morePaintings)
 
 };
