@@ -40,7 +40,7 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-    console.log("Service Worker Fetching");
+    // console.log("Service Worker Fetching");
 
     if(e.request.method == 'GET' && e.request.headers.get('accept').includes('text/html')){
         e.respondWith(
@@ -52,7 +52,7 @@ self.addEventListener('fetch', (e) => {
             .catch(() => caches.match('/offline'))
         );
     }else if(e.request.method == 'GET' && e.request.headers.get('accept').includes('image/*')){
-        console.log('dit is een image request');
+        // console.log('dit is een image request');
     }
     else if(e.request.method == 'GET' && e.request.headers.get('accept').includes('text/css')){
         console.log('dit is een css request');
