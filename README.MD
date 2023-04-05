@@ -1,5 +1,8 @@
 # Progressive Web Apps @cmda-minor-web 2022 - 2023
 
+## Link to application :smile:
+[Progressive application](https://progressive-web-app-production.up.railway.app/)
+
 ## Description :pen:
 In this course we convert the client side web application, made during the Web App From Scratch course, into a server side rendered application. We also add functionalities based on the Service Worker and turn the application into a Progressive Web App. Finally we’ll implement a series of optimisations to improve the performance of the application.
 
@@ -225,5 +228,337 @@ In my layouts/main.hbs
 and voila I did some more but I thought this was the most relevant pieces of code.
 
 ## Week 2
+
+This week I focussed on converting some more parts of the application to node and trying to improve some bits of code
+
+I first went ahead and implemented infinite scroll in my application. For that I used an combination of client side and server side to get it done.
+First in my client side.
+
+```javascript
+window.addEventListener("scroll", () => {
+    const endOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight - 500;
+    
+    if(endOfPage && !fired) {
+      
+        console.log("end of page");
+        loadMoreArt();
+        fired = true;
+    }else if(!endOfPage){
+      fired = false;
+    }
+  
+  
+});
+```
+A simple scroll event when the user has hit the bottom of the page this will invoke the function `loadMoreArt`
+The `loadMoreArt` function send a request to the server side
+```javascript
+const loadMoreArt = async () => {
+    loading = true;
+    if(loading){
+
+      const response = await fetch(url);
+      const data = await response.json();
+
+      displayArt(data);
+
+      loading = false;
+
+    }
+}
+```
+
+In the server side I make an api call and send the response back to my client side.
+```javascript
+const loadMoreArt = async (req, res) => {
+    page++;
+
+    const response = await fetch(`${domain}?key=${apiKey}&p=${page}&ps=${limit}`);
+    
+    const {artObjects: data} = await response.json();
+
+    const morePaintings = await Promise.all(data.map( async (painting) => {
+        const smallImg = await getSmallerImg(painting.objectNumber);
+
+        const newPainting = {
+            ...painting,
+            smallImg,
+        };
+
+        return newPainting;
+    }));
+
+    res.send(morePaintings)
+
+};
+
+```
+Next in my client side I invoke the function `displayArt()` and this simply appends the html
+
+```javascript
+export const displayArt = async (paintings) => {
+
+
+  paintings.forEach(painting => {
+    var liHtml = `
+    <li class="loading">
+      <a href="/art/${painting.objectNumber}">
+        <img src="${painting.smallImg}" alt="${painting.title}" srcset="">
+      </a>
+    </li>`;
+    container.insertAdjacentHTML("beforeend", liHtml);
+    const lastLi = container.lastElementChild;
+
+    setTimeout(() => {
+      lastLi.classList.remove("loading");
+      }, 400);
+    
+  });
+
+};
+```
+
+and thats how the infinite scrolling is implemented :clap:.
+If you are curious how I implemented more server side with client side you can also check out the search function.
+
+### Manifest.json
+Next I created an manifest.json but what is this?  `manifest.json` is a configuration file used in web applications and browser extensions to define various properties and features of the application or extension. It is a JSON file that provides information about the application or extension, such as its name, version, description, icons, permissions, background scripts, content scripts, and more.
+
+In a web application, the manifest.json file is used to define the application's basic settings, such as its start URL, its display mode, and its icon. It can also be used to configure offline caching, push notifications, and other advanced features.
+
+In a browser extension, the manifest.json file is used to define the extension's functionality, permissions, and settings. It can specify what pages the extension can access, what scripts it can run, what icons it should display, and what APIs it can use.
+
+The manifest.json file is a critical part of both web applications and browser extensions, as it provides important information to the browser or platform on how to handle and display the application or extension.
+
+```javascript
+{
+    "name": "Rijksmusuem Gallery",
+    "version": "1.0",
+    "description": "A simple web application to view the Rijksmuseum's collection",
+    "icons": [
+      {
+          "src": "images/icons/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+      },
+      {
+          "src": "images/icons/icon-256x256.png",
+          "sizes": "256x256",
+          "type": "image/png"
+      },
+      {
+          "src": "images/icons/icon-384x384.png",
+          "sizes": "384x384",
+          "type": "image/png"
+      },
+      {
+          "src": "images/icons/icon-512x512.png",
+          "sizes": "512x512",
+          "type": "image/png"
+      }
+  ],
+    "display": "standalone",
+    "start_url": "/",
+    "background_color": "#000000",
+    "theme_color": "#454545",
+    "short_name": "Rijksmusuem Gallery",
+    "orientation": "portrait",
+    "scope": "/"
+
+}
+```
+
+### Service workers
+The next task was to implement service workers in my application but what are service workers :eyes:.
+
+Service Workers are JavaScript files that run in the background of a web application, independently of the web page, and provide additional functionalities such as caching, offline capabilities, and push notifications.
+
+In other words, service workers act as a proxy between the web application and the network, intercepting requests and allowing for actions to be taken, such as serving cached data when a network connection is unavailable or pushing a notification to the user when a specific event occurs.
+
+Service workers are event-driven and can be programmed to perform specific actions in response to events, such as intercepting requests, caching resources, updating the cache, and syncing data with the server when a network connection is available.
+
+Service workers can enhance the performance of web applications by reducing the number of network requests and providing a better user experience by making the web application available offline or when network connectivity is poor.
+
+The way you implement service workes goes as followed.
+
+1. Register the service worker: The first step is to register the service worker by including the following code in your JavaScript file:
+
+```javascript
+if('serviceWorker' in navigator){
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('../service-worker.js')
+        .then(registration => {
+            console.log('SW registered: ', registration);
+        })
+        .catch(error => {
+            console.log('SW registration failed: ', error);
+        })
+    });
+}
+```
+This code checks if the browser supports service workers and then registers it.
+
+2. Install the service worker: Once the service worker is registered, the browser downloads the service worker file and installs it. This is done by adding an `install` event listener to the service worker file. The code inside this event listener is executed when the service worker is first installed.
+
+```javascript
+self.addEventListener('install', (e) => {
+    console.log("Service Worker Installed");
+
+    e.waitUntil(
+        caches.open(CACHE_NAME)
+            .then((cache) => {
+                console.log("Service Worker Caching Files");
+                cache.addAll(urlsToCache);
+            })
+            .then(() => self.skipWaiting())
+    )
+});
+```
+
+`urlsToCache` is an array of urls that the browser should catch.
+
+```javascript
+const urlsToCache = [
+    '/',
+    '/css/app.css',
+    '/js/infiniteScroll.js',
+    '/js/search.js',
+];
+```
+
+3. Activate the service worker: After the service worker is installed, it needs to be activated. This is done by adding an `activate` event listener to the service worker file. The code inside this event listener is executed when the service worker is activated. This code deletes any old caches that are no longer needed.
+
+```javascript
+self.addEventListener('activate', (e) => {
+    console.log("Service Worker Activated");
+
+    e.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cache) => {
+                    if(cache !== CACHE_NAME){
+                        console.log("Service Worker Clearing Old Cache");
+                        return caches.delete(cache);
+                    }
+                })
+            );
+        })
+    );
+});
+```
+
+4. Use the service worker: Once the service worker is registered, installed, and activated, it can be used to intercept network requests and perform actions such as caching and serving cached assets. This is done by adding an `fetch` event listener to the service worker file. The code inside this event listener is executed whenever a network request is made.
+
+```javascript
+self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    caches.match(event.request).then(function(response) {
+      if (response) {
+        return response;
+      }
+      return fetch(event.request);
+    })
+  );
+});
+```
+
+This are the basics on how to implement a service worker but I wanted to take it a step further but that is for next week stay tuned :smirk:
+
+## Week 3
+This week I wanted focus on improving the performance of my application and work some more with the service workers.
+
+First I minified my css. For this I used sass.
+
+I created different sass files to write my styling and import them all in `app.scss`
+
+```css
+@import 'grid';
+@import 'details';
+@import 'search';
+@import 'error';
+@import 'offline';
+@import 'loading';
+@import 'related';
+
+```
+
+Next I created a script in my packaga.json that minifies the css
+```
+ "scss": "sass --watch scss/app.scss public/css/app.css --style compressed",
+```
+
+This script takes whatever is in my `app.scss` and compiles it to css in `app.css`. After doing all this I am left with this.
+
+```css
+main ul{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;grid-auto-rows:96px;gap:.1em;transition:.4s}main ul li{list-style:none;background-color:#454545;transition:transform 5s ease-in;transition:.8s;animation:fadein 1s;animation-fill-mode:forwards}main ul li a{display:flex;height:100%}main ul li:hover{transform:scale(1.2);transition:.2s;z-index:1}main ul li img{width:100%;height:100%;object-fit:cover;transition:.8s}@keyframes fadein{from{opacity:0}to{opacity:1}}main figure{height:50vh;position:relative}main figure img{width:100%;height:100%;object-fit:contain}main figure figcaption{position:absolute;bottom:0;left:0;width:100%;height:50%;background:linear-gradient(0deg, black, transparent);color:#fff;display:flex;justify-content:center;align-items:center;font-size:32px;font-weight:300;transition:.4s;font-family:"Octarine";padding:10px;font-family:fantasy}main h3{color:#fff;padding:10px;font-family:fantasy}main section.information{padding:10px;font-family:fantasy}main section.information p{font-size:1em;font-weight:100;color:#fff}form{position:fixed;width:90%;left:50%;bottom:32px;transform:translateX(-50%)}form input{width:45px;height:45px;border:none;border-radius:30px;padding:0 16px;font-size:12px;outline:none;background-color:#454545;color:#d0d0d0;transition:.4s}form input:focus{width:100%;aspect-ratio:0}section.error{width:100%;height:100vh;display:flex;justify-content:center;align-items:center}section.error div h2{font-weight:100;color:#fff}section.error div p{color:#fff;text-align:center}section.offline{height:100vh;display:flex;justify-content:center;align-items:center}section.offline h1{color:#fff;font-weight:100}div#loading{display:flex;justify-content:center;align-items:center;margin-top:20px}div#loading img{height:2.5em;width:2.5em}section.related h2{margin-bottom:20px;padding:10px;font-weight:100;color:#fff;font-family:fantasy}*{margin:0;padding:0;box-sizing:border-box}body{font-family:"Poppins",sans-serif;background-color:#000}body main{min-height:100vh}label{display:none}input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none}main ul li:nth-of-type(1){grid-column:1/3;grid-row:1/3}main ul li:nth-of-type(4){grid-column:3/5}main ul li:nth-of-type(6){grid-row:3/5}main ul li:nth-of-type(13){grid-row:5/7}main ul li:nth-of-type(14){grid-row:5/7}main ul li:nth-of-type(15){grid-row:5/7}main ul li:nth-of-type(21){grid-column:1/3}main ul li:nth-of-type(22){grid-column:3/5}/*# sourceMappingURL=app.css.map */
+
+```
+
+all the scss is compiled to css and compressed benefits of this? Minification is the process of minimizing code and markup in your web pages and script files. It’s one of the main methods used to reduce load times and bandwidth usage on websites. Minification dramatically improves site speed and accessibility, directly translating into a better user experience. 
+
+Next I looked at some of the images. The images in my application are quite big. If you scroll back to week 1 you see a function called `getSmallerImg(). What I basically did is to fetch smaller sized images to improve the performance further. Downside of this is that the images are a lil bit of a lower quality
+
+`getSmallerImg()`
+```javascript
+const getSmallerImg = async(objectNumber) => {
+    try{
+        const smallerImg = await fetch(`${domain}${objectNumber}/tiles?key=${apiKey}`);
+        const data = await smallerImg.json();
+      
+        const z4s = data.levels.filter(level => level.name == "z4");
+        const z4 = z4s[0].tiles[0].url.replace("http", "https");
+      
+        return z4;
+    }catch(error){
+        return "https://rkd.nl/images/partners/rijksmuseum-logo.jpg";
+    }
+};
+```
+
+Next I worked a lil bit more on the service workers. At the time service workers was still a tricky concept to grasp but eventually I figured it out.
+
+I started working on the fetch part of the service worker. What I wanted to implement was an offline page.
+
+```javascript
+self.addEventListener('fetch', (e) => {
+    console.log("Service Worker Fetching", e.request.headers.get('accept'));
+    // console.log(e.request);
+
+    if(e.request.method == 'GET' && e.request.headers.get('accept').includes('text/html')){
+        console.log("dit is een html get request", e.request.url)
+        e.respondWith(
+
+            caches.match(e.request.url)
+            .then((response) => {
+                return response || fetch(e.request.url)
+            })
+            .catch(() => caches.match('/offline'))
+        );
+    }else if(e.request.method == 'GET' && e.request.headers.get('accept').includes('image/*')){
+        console.log('dit is een image request');
+    }
+    else if(e.request.method == 'GET' && e.request.headers.get('accept').includes('text/css')){
+        console.log('dit is een css request');
+
+        e.respondWith(
+            caches.match(e.request)
+            .then((response) => {
+                return response || fetch(e.request);
+            })
+        );
+    }
+});
+```
+
+First I check whether the request is a GET request and if it is an html file
+
+```javascript
+ if(e.request.method == 'GET' && e.request.headers.get('accept').includes('text/html'))
+```
+
+If the condition is true I invoke the function `e.respondWith(). In this function I check whether the requested url matches the urls that are in my cache if it does simply fetch the page from the requested url. If something were to go wrong for example the requested url is not in the cache show me the offline page.
+
+### Hurdles
+ I also tried to use gulp to minify my javascript in order to boost the performance further but sadly I couldnt get it done on time.
 
 
