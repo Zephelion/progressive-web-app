@@ -40,11 +40,9 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-    console.log("Service Worker Fetching", e.request.headers.get('accept'));
-    // console.log(e.request);
+    console.log("Service Worker Fetching");
 
     if(e.request.method == 'GET' && e.request.headers.get('accept').includes('text/html')){
-        console.log("dit is een html get request", e.request.url)
         e.respondWith(
 
             caches.match(e.request.url)
