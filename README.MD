@@ -561,4 +561,9 @@ If the condition is true I invoke the function `e.respondWith(). In this functio
 ### Hurdles
  I also tried to use gulp to minify my javascript in order to boost the performance further but sadly I couldnt get it done on time.
 
+ ### Activity Diagram
+ |Activity diagram|
+|---| 
+|![Startscreen](public/images/readme/activity.jpg)| 
+
 
